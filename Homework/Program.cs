@@ -16,7 +16,7 @@ namespace Homework
         {
             DoTaskLottery();
             DoTaskExcel();
-
+            Console.ReadKey();
         }
         static void DoTaskLottery()
         {
@@ -42,40 +42,30 @@ namespace Homework
             Application excelApp = new Application();
             Workbook workBook = excelApp.Workbooks.Open($"{Environment.CurrentDirectory}\\input.xlsx");
             Worksheet workSheet = workBook.Worksheets[1];
-            object[,] readRange = workSheet.Range["A2", "B10"].Value2;
+            object[,] range = workSheet.Range["A2", "B10"].Value2;
             Dictionary<string, string> illcure = new Dictionary<string, string>();
-            //Словарь для ключ болезень - значение Лекарство
-            for (int i = 1; i <= readRange.GetLength(0); i++)
+            for (int i = 1; i <= range.GetLength(0); i++)
             {
-                illcure.Add(readRange[i, 1].ToString().ToLower(), readRange[i, 2].ToString());
-                //Переводим Object в string
+                illcure.Add(range[i, 1].ToString().ToLower(), range[i, 2].ToString());
             }
-            //Console.WriteLine("Reading result:");
-            //foreach (var k in illcure)
-            //{
-            //    Console.WriteLine($"{k.Key}->{k.Value}");
-            //}
             workBook.Close();
-            //Cловарь получили закрываем наш workbook
-            //Открываем output.xlsc
             workBook = excelApp.Workbooks.Open($"{Environment.CurrentDirectory}\\output.xlsx");
             workSheet = workBook.Worksheets[1];
-            //Перезаписываем записываем словарь
-            readRange = workSheet.Range["G2", "G35"].Value2;
-            for (int i = 1; i <= readRange.Length; i++)
+            range = workSheet.Range["G2", "G35"].Value2;
+            for (int i = 1; i <= range.Length; i++)
             {
                 //Изменяем массив 
-                string readString = readRange[i, 1].ToString().ToLower();
+                string stringExcel = range[i, 1].ToString().ToLower();
                 foreach (var pair in illcure)
                 {
-                    if (readString.Contains(pair.Key))
+                    if (stringExcel.Contains(pair.Key))
                     {
-                        readRange[i, 1] = pair.Value;
+                        range[i, 1] = pair.Value;
                         break;
                     }
                 }
             }
-            workSheet.Range["H2", "H35"].Value2 = readRange;
+            workSheet.Range["H2", "H35"].Value2 = range;
             workBook.Save();
             workBook.Close();
             excelApp.Quit();
