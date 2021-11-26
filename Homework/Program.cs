@@ -15,7 +15,7 @@ namespace Homework
         static void Main(string[] args)
         {
             DoTaskLottery();
-            //DoTaskExcel();
+            DoTaskExcel();
 
         }
         static void DoTaskLottery()
@@ -39,29 +39,32 @@ namespace Homework
         }
         static void DoTaskExcel()
         {
-            Application excel = new Application();
-            Workbook wb = excel.Workbooks.Open($"{Environment.CurrentDirectory}\\input.xlsx");
-            Worksheet ws = wb.Worksheets[1];
-            Console.WriteLine("Opened input");
-            object[,] readRange = ws.Range["A2", "B10"].Value2;
+            Application excelApp = new Application();
+            Workbook workBook = excelApp.Workbooks.Open($"{Environment.CurrentDirectory}\\input.xlsx");
+            Worksheet workSheet = workBook.Worksheets[1];
+            object[,] readRange = workSheet.Range["A2", "B10"].Value2;
             Dictionary<string, string> illcure = new Dictionary<string, string>();
+            //Словарь для ключ болезень - значение Лекарство
             for (int i = 1; i <= readRange.GetLength(0); i++)
             {
                 illcure.Add(readRange[i, 1].ToString().ToLower(), readRange[i, 2].ToString());
+                //Переводим Object в string
             }
-            Console.WriteLine("Reading result:");
-            foreach (var k in illcure)
-            {
-                Console.WriteLine($"{k.Key}->{k.Value}");
-            }
-            wb.Close();
-            Console.WriteLine("Closed input");
-            wb = excel.Workbooks.Open($"{Environment.CurrentDirectory}\\output.xlsx");
-            ws = wb.Worksheets[1];
-            Console.WriteLine("Opened output");
-            readRange = ws.Range["G2", "G35"].Value2;
+            //Console.WriteLine("Reading result:");
+            //foreach (var k in illcure)
+            //{
+            //    Console.WriteLine($"{k.Key}->{k.Value}");
+            //}
+            workBook.Close();
+            //Cловарь получили закрываем наш workbook
+            //Открываем output.xlsc
+            workBook = excelApp.Workbooks.Open($"{Environment.CurrentDirectory}\\output.xlsx");
+            workSheet = workBook.Worksheets[1];
+            //Перезаписываем записываем словарь
+            readRange = workSheet.Range["G2", "G35"].Value2;
             for (int i = 1; i <= readRange.Length; i++)
             {
+                //Изменяем массив 
                 string readString = readRange[i, 1].ToString().ToLower();
                 foreach (var pair in illcure)
                 {
@@ -72,13 +75,10 @@ namespace Homework
                     }
                 }
             }
-            ws.Range["G2", "G35"].Value2 = readRange;
-            Console.WriteLine("Written output");
-            wb.Save();
-            Console.WriteLine("Saved output");
-            wb.Close();
-            excel.Quit();
-            Console.WriteLine("Closed output");
+            workSheet.Range["H2", "H35"].Value2 = readRange;
+            workBook.Save();
+            workBook.Close();
+            excelApp.Quit();
         }
         static void SetListStudentsFromFile(out List<Student> students)
         {
